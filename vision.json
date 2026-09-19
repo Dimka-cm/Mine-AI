@@ -1,47 +1,47 @@
 {
   "x": {
-    "mae": 0.1633,
-    "baseline": 0.2092
+    "mae": 0.133,
+    "baseline": 0.2208
   },
   "z": {
-    "mae": 0.1869,
-    "baseline": 0.2278
+    "mae": 0.1389,
+    "baseline": 0.2174
   },
   "наклон": {
-    "mae": 0.0893,
-    "baseline": 0.3215
+    "mae": 0.0547,
+    "baseline": 0.3255
   },
   "стена впереди": {
-    "mae": 0.1678,
-    "baseline": 0.224
+    "mae": 0.1119,
+    "baseline": 0.2172
   },
   "стена справа": {
-    "mae": 0.1865,
-    "baseline": 0.2136
+    "mae": 0.1672,
+    "baseline": 0.2213
   },
   "стена сзади": {
-    "mae": 0.1651,
-    "baseline": 0.224
+    "mae": 0.1148,
+    "baseline": 0.2172
   },
   "стена слева": {
-    "mae": 0.1764,
-    "baseline": 0.2136
+    "mae": 0.1703,
+    "baseline": 0.2213
   },
   "видит oak_log": {
-    "mae": 0.3013,
-    "baseline": 0.3854
+    "mae": 0.254,
+    "baseline": 0.3813
   },
   "видит stone": {
-    "mae": 0.2595,
-    "baseline": 0.344
+    "mae": 0.1991,
+    "baseline": 0.3271
   },
   "видит iron_ore": {
-    "mae": 0.3447,
-    "baseline": 0.4589
+    "mae": 0.2986,
+    "baseline": 0.4476
   },
   "видит diamond_ore": {
-    "mae": 0.4115,
-    "baseline": 0.5006
+    "mae": 0.3982,
+    "baseline": 0.4992
   },
-  "facing_acc": 0.8018
+  "facing_acc": 0.8574
 }
