@@ -1,0 +1,100 @@
+name: Обучение зрения
+
+# Обучение зрения координатам ПРЯМО НА GITHUB.
+#
+# Почему именно зрение, а не полный RL: этот этап укладывается в лимиты
+# бесплатных раннеров. Один job на GitHub-hosted машине жёстко обрывается
+# через 6 часов, поднять лимит нельзя ни на одном тарифе. Обучение зрения
+# на 2-ядерном раннере занимает десятки минут — помещается с запасом.
+#
+# Полный RL-прогон (до алмазного меча, ~9 часов на RTX 3060) сюда НЕ влезет:
+# у бесплатных раннеров нет GPU, а 6 часов на двух ядрах не хватит.
+# Для него нужен self-hosted runner на вашей машине — см. train-rl.yml.
+
+on:
+  workflow_dispatch:        # запуск только вручную: это долгая задача
+    inputs:
+      samples:
+        description: "Сколько кадров собрать"
+        required: false
+        default: "4000"
+      epochs:
+        description: "Сколько эпох учить"
+        required: false
+        default: "20"
+      width:
+        description: "Ширина кадра"
+        required: false
+        default: "426"
+      height:
+        description: "Высота кадра"
+        required: false
+        default: "240"
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350    # почти предел GitHub-hosted (жёсткий потолок 360)
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Поставить Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Кэш пакетов pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+
+      - name: Поставить зависимости
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install numpy pytest pillow
+
+      - name: Показать, на чём считаем
+        run: |
+          echo "ядер: $(nproc)"
+          free -h | head -2
+          python -c "import torch; print('torch', torch.__version__)"
+
+      - name: Обучить зрение
+        # Раннер даёт 2 ядра и ~16 ГБ ОЗУ, но кадры едят память:
+        # 426x240x3 = 307 КБ на кадр. Лимит держим осознанно.
+        run: |
+          python pretrain_vision.py \
+            --samples ${{ inputs.samples }} \
+            --epochs ${{ inputs.epochs }} \
+            --width ${{ inputs.width }} \
+            --height ${{ inputs.height }} \
+            --cores 2 \
+            --ram-limit 6000 \
+            --out vision.pt 2>&1 | tee train.log
+
+      - name: Собрать отчёт в сводку
+        # Результат виден прямо на странице запуска, а не только в логах.
+        if: always()
+        run: |
+          {
+            echo "## Результат обучения зрения"
+            echo ""
+            echo '```'
+            sed -n '/ЧТО АГЕНТ НАУЧИЛСЯ ВИДЕТЬ/,/^===/p' train.log || tail -30 train.log
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Выложить обученные глаза
+        # Скачать можно со страницы запуска, во вкладке Artifacts.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vision-weights
+          path: |
+            vision.pt
+            vision.json
+            train.log
+          retention-days: 30

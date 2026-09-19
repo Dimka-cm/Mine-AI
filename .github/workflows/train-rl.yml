@@ -1,0 +1,78 @@
+name: Обучение RL (свой раннер)
+
+# ПОЛНОЕ обучение с подкреплением — на ВАШЕЙ машине через self-hosted runner.
+#
+# Почему не на GitHub: у бесплатных GitHub-hosted раннеров нет GPU, а job
+# жёстко обрывается через 6 часов. Прогон до алмазного меча — около 9 часов
+# на RTX 3060. Не влезает.
+#
+# Self-hosted runner снимает оба ограничения: считает ваша RTX 3060,
+# а лимит времени поднимается до 5 суток.
+#
+# Как подключить свою машину (делается один раз):
+#   1. Настройки репозитория -> Actions -> Runners -> New self-hosted runner
+#   2. Выполнить показанные команды в PowerShell
+#   3. Запустить: run.cmd  (или поставить службой)
+# После этого запускать отсюда: Actions -> Обучение RL -> Run workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      episodes:
+        description: "Сколько эпизодов"
+        required: false
+        default: "20000"
+      algo:
+        description: "Алгоритм: dqn или ppo"
+        required: false
+        default: "dqn"
+      goal:
+        description: "Стартовая цель (индекс 0..13)"
+        required: false
+        default: "0"
+      curriculum:
+        description: "Вести по целям от простых к сложным"
+        type: boolean
+        required: false
+        default: true
+
+jobs:
+  train:
+    runs-on: self-hosted
+    timeout-minutes: 4320   # до 72 часов — предел для своего раннера
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Показать железо
+        run: |
+          python -c "import torch; print('torch', torch.__version__, '| CUDA:', torch.cuda.is_available())"
+          python -c "import torch; print('GPU:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'нет')"
+
+      - name: Обучение
+        # --threads 5: пять ядер под обучение, шестое остаётся вам,
+        # чтобы видео и браузер не заикались.
+        #
+        # ВНИМАНИЕ: train.py работает с символьной моделью CraftBrain.
+        # Обученные глаза (vision.pt) относятся к пиксельной PixelBrain и
+        # сюда пока не подключаются — для этого нужен отдельный цикл
+        # обучения на пикселях. См. README, раздел про зрение.
+        run: |
+          python train.py \
+            --algo ${{ inputs.algo }} \
+            --episodes ${{ inputs.episodes }} \
+            --goal ${{ inputs.goal }} \
+            --threads 5 \
+            --save checkpoints/brain.pt \
+            ${{ inputs.curriculum && '--curriculum' || '' }}
+
+      - name: Выложить чекпоинты и метрики
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rl-checkpoint
+          path: |
+            checkpoints/*.pt
+            data/metrics.json
+            data/progress.jsonl
+          retention-days: 30
