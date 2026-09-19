@@ -1,0 +1,8 @@
+{"ep": 250, "goal": "oak_log", "goal_idx": 0, "avg_reward": -15.98, "success_rate": 0.172, "eps": 0.673, "elapsed_s": 100, "total_successes": 43}
+{"ep": 500, "goal": "oak_log", "goal_idx": 0, "avg_reward": -11.21, "success_rate": 0.192, "eps": 0.343, "elapsed_s": 208, "total_successes": 91}
+{"ep": 750, "goal": "oak_planks", "goal_idx": 1, "avg_reward": -1.76, "success_rate": 0.229, "eps": 0.342, "elapsed_s": 306, "total_successes": 176}
+{"ep": 1000, "goal": "oak_planks", "goal_idx": 1, "avg_reward": -10.45, "success_rate": 0.276, "eps": 0.05, "elapsed_s": 408, "total_successes": 267}
+{"ep": 1250, "goal": "oak_planks", "goal_idx": 1, "avg_reward": -21.5, "success_rate": 0.264, "eps": 0.05, "elapsed_s": 522, "total_successes": 362}
+{"ep": 1500, "goal": "oak_planks", "goal_idx": 1, "avg_reward": -24.43, "success_rate": 0.108, "eps": 0.05, "elapsed_s": 645, "total_successes": 416}
+{"ep": 1750, "goal": "stick", "goal_idx": 2, "avg_reward": -16.91, "success_rate": 0.0, "eps": 0.594, "elapsed_s": 764, "total_successes": 472}
+{"ep": 2000, "goal": "oak_planks", "goal_idx": 2, "avg_reward": -10.47, "success_rate": 0.015, "eps": 0.249, "elapsed_s": 879, "total_successes": 495}

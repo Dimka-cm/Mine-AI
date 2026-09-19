@@ -1,0 +1,422 @@
+[
+ {
+  "episode": 1,
+  "reward": -30.42,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 2,
+  "reward": -35.81,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 3,
+  "reward": -50.41,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 4,
+  "reward": -40.12,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 5,
+  "reward": -58.39,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 6,
+  "reward": -51.88,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 7,
+  "reward": -58.57,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 8,
+  "reward": -45.85,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 9,
+  "reward": 11.56,
+  "steps": 96,
+  "goal": "oak_planks",
+  "success": true
+ },
+ {
+  "episode": 10,
+  "reward": -45.7,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 11,
+  "reward": 14.49,
+  "steps": 36,
+  "goal": "oak_planks",
+  "success": true
+ },
+ {
+  "episode": 12,
+  "reward": -17.11,
+  "steps": 67,
+  "goal": "oak_planks",
+  "success": true
+ },
+ {
+  "episode": 13,
+  "reward": -41.01,
+  "steps": 87,
+  "goal": "oak_planks",
+  "success": true
+ },
+ {
+  "episode": 14,
+  "reward": -62.63,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 15,
+  "reward": -71.13,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 16,
+  "reward": -50.7,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 17,
+  "reward": -56.32,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 18,
+  "reward": -49.33,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 19,
+  "reward": -49.45,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 20,
+  "reward": 0.53,
+  "steps": 16,
+  "goal": "oak_planks",
+  "success": true
+ },
+ {
+  "episode": 21,
+  "reward": -0.07,
+  "steps": 11,
+  "goal": "oak_planks",
+  "success": true
+ },
+ {
+  "episode": 22,
+  "reward": -8.58,
+  "steps": 25,
+  "goal": "oak_planks",
+  "success": true
+ },
+ {
+  "episode": 23,
+  "reward": -37.02,
+  "steps": 84,
+  "goal": "oak_planks",
+  "success": true
+ },
+ {
+  "episode": 24,
+  "reward": -34.44,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 25,
+  "reward": -22.96,
+  "steps": 52,
+  "goal": "oak_planks",
+  "success": true
+ },
+ {
+  "episode": 26,
+  "reward": -59.03,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 27,
+  "reward": -35.43,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 28,
+  "reward": -44.41,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 29,
+  "reward": -44.08,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 30,
+  "reward": -9.08,
+  "steps": 24,
+  "goal": "oak_planks",
+  "success": true
+ },
+ {
+  "episode": 31,
+  "reward": -43.92,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 32,
+  "reward": -49.2,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 33,
+  "reward": -49.39,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 34,
+  "reward": -24.77,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 35,
+  "reward": -22.62,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 36,
+  "reward": 50.95,
+  "steps": 28,
+  "goal": "stick",
+  "success": true
+ },
+ {
+  "episode": 37,
+  "reward": -36.39,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 38,
+  "reward": -44.9,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 39,
+  "reward": -38.75,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 40,
+  "reward": -31.53,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 41,
+  "reward": -22.45,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 42,
+  "reward": -33.64,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 43,
+  "reward": -32.02,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 44,
+  "reward": -48.47,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 45,
+  "reward": -46.16,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 46,
+  "reward": -51.31,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 47,
+  "reward": -11.24,
+  "steps": 51,
+  "goal": "oak_planks",
+  "success": true
+ },
+ {
+  "episode": 48,
+  "reward": -43.91,
+  "steps": 100,
+  "goal": "oak_planks",
+  "success": false
+ },
+ {
+  "episode": 49,
+  "reward": -15.74,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 50,
+  "reward": -31.55,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 51,
+  "reward": -30.57,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 52,
+  "reward": -44.2,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 53,
+  "reward": -36.45,
+  "steps": 100,
+  "goal": "crafting_table",
+  "success": false
+ },
+ {
+  "episode": 54,
+  "reward": -24.73,
+  "steps": 100,
+  "goal": "crafting_table",
+  "success": false
+ },
+ {
+  "episode": 55,
+  "reward": -27.6,
+  "steps": 100,
+  "goal": "crafting_table",
+  "success": false
+ },
+ {
+  "episode": 56,
+  "reward": -53.66,
+  "steps": 100,
+  "goal": "crafting_table",
+  "success": false
+ },
+ {
+  "episode": 57,
+  "reward": -39.42,
+  "steps": 100,
+  "goal": "crafting_table",
+  "success": false
+ },
+ {
+  "episode": 58,
+  "reward": -37.33,
+  "steps": 100,
+  "goal": "crafting_table",
+  "success": false
+ },
+ {
+  "episode": 59,
+  "reward": -24.53,
+  "steps": 100,
+  "goal": "stick",
+  "success": false
+ },
+ {
+  "episode": 60,
+  "reward": -27.95,
+  "steps": 100,
+  "goal": "crafting_table",
+  "success": false
+ }
+]

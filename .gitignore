@@ -1,0 +1,49 @@
+# --- базы данных наград и метрик ---
+# Это рабочие артефакты: у dashboard.db и long.db десятки мегабайт,
+# и они пересоздаются кодом. В репозитории им не место.
+data/*.db
+data/*.db-wal
+data/*.db-shm
+*.db
+*.db-wal
+*.db-shm
+
+# --- веса моделей ---
+# vision.pt (454 КБ) намеренно НЕ игнорируем — это полезный артефакт,
+# с ним RL стартует зрячим. А вот тяжёлые чекпоинты RL игнорируем.
+checkpoints/
+*.ckpt
+long.pt
+brain_*.pt
+
+# --- текстуры, извлечённые из .jar ---
+# Ассеты Minecraft нельзя выкладывать: они под лицензией Mojang.
+# Пользователь извлекает их сам через tools/extract_textures.py
+textures.npz
+assets/
+*.jar
+
+# --- python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- node ---
+node_modules/
+npm-debug.log*
+
+# --- логи и временное ---
+*.log
+data/train_long.log
+/tmp/
+.DS_Store
+
+# --- результаты прогонов ---
+runs/
+outputs/
+vision_compass.png
