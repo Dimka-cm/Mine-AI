@@ -37,8 +37,8 @@ class PixelVisionEnv:
     видит всё движение. Ровно этот приём даёт DQN понимание скорости.
     """
 
-    def __init__(self, env: MinecraftCraftEnv, width: int = 426,
-                 height: int = 240, n_frames: int = 4, frame_skip: int = 1,
+    def __init__(self, env: MinecraftCraftEnv, width: int = 640,
+                 height: int = 360, n_frames: int = 4, frame_skip: int = 1,
                  fov: float = 75.0, max_dist: float = 12.0,
                  keep_symbolic_world: bool = False):
         self.env = env

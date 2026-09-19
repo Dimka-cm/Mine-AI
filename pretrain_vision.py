@@ -178,6 +178,20 @@ class VisionNet(nn.Module):
 # --------------------------------------------------------------------------
 # ОБУЧЕНИЕ
 # --------------------------------------------------------------------------
+def evaluate(model, Xte, Yte, Fte, batch: int):
+    """Считает ошибку на проверочной выборке. Возвращает (P, FP)."""
+    model.eval()
+    P, FP = [], []
+    with torch.no_grad():
+        for i in range(0, len(Xte), batch):
+            xb = torch.from_numpy(Xte[i:i + batch]).float().div_(255.0)
+            r, f = model(xb)
+            P.append(r)
+            FP.append(f.argmax(1))
+    model.train()
+    return torch.cat(P).numpy(), torch.cat(FP).numpy()
+
+
 def run(args):
     reserve_cores(args.cores)
     apply_torch_limits()
@@ -193,12 +207,19 @@ def run(args):
     rc = Raycaster(w, h, fov=75.0, max_dist=12.0)
     rng = np.random.default_rng(args.seed)
 
-    n_test = max(200, args.samples // 6)
+    # Проверочная выборка по умолчанию — шестая часть обучающей, но на
+    # больших прогонах это слишком дорого: при 18 000 кадров она съедает
+    # 2.07 ГБ и выталкивает всё за лимит памяти. Для оценки качества
+    # полутора тысяч кадров хватает с избытком.
+    n_test = args.test_samples if args.test_samples else max(200, args.samples // 6)
     # Кадр 426x240x3 = 307 КБ. Держать в ОЗУ десятки тысяч нельзя:
     # 6000 кадров это уже 1.8 ГБ. Предупреждаем честно, до сбора.
-    mb = (args.samples + n_test) * 3 * h * w / 1e6
+    # К кадрам добавляем накладные: сам torch, интерпретатор и батч с
+    # активациями. Раньше считались только кадры, и прогон на 18 000
+    # проходил проверку, а потом падал по OOM в середине обучения.
+    mb = (args.samples + n_test) * 3 * h * w / 1e6 + 1650
     print(f"Сбор данных: {args.samples} обучающих + {n_test} проверочных, {w}x{h}")
-    print(f"Потребуется ОЗУ под кадры: ~{mb:.0f} МБ")
+    print(f"Потребуется ОЗУ: ~{mb:.0f} МБ (кадры + torch + батч)")
     if mb > args.ram_limit:
         raise SystemExit(
             f"Слишком много: {mb:.0f} МБ > лимита {args.ram_limit} МБ.\n"
@@ -219,6 +240,7 @@ def run(args):
     n = len(Xtr)
 
     print(f"\nОбучение: {args.epochs} эпох по {n} кадров, батч {args.batch}")
+    curve: list = []
     t_start = time.perf_counter()
     for ep in range(args.epochs):
         model.train()
@@ -237,9 +259,18 @@ def run(args):
             tot += float(loss.detach()) * len(idx)
         sched.step()
         el = time.perf_counter() - t_start
-        print(f"  эпоха {ep + 1:2d}/{args.epochs}  потеря {tot / n:.4f}  "
-              f"({el:.0f} с, осталось ~{el / (ep + 1) * (args.epochs - ep - 1):.0f} с)",
-              flush=True)
+        line = (f"  эпоха {ep + 1:2d}/{args.epochs}  потеря {tot / n:.4f}  "
+                f"({el:.0f} с, осталось ~{el / (ep + 1) * (args.epochs - ep - 1):.0f} с)")
+        # Промежуточная проверка на НОВЫХ мирах: видно, продолжает ли модель
+        # учиться или уже упёрлась в потолок. Без этого 45 эпох — гадание.
+        if args.eval_every and (ep + 1) % args.eval_every == 0:
+            P_, FP_ = evaluate(model, Xte, Yte, Fte, args.batch)
+            acc_ = float((FP_ == Fte).mean())
+            mx_ = float(np.abs(P_[:, 0] - Yte[:, 0]).mean()) * (WORLD_W - 1)
+            line += f"  | сторона света {acc_ * 100:.0f}%  x {mx_:.2f} бл"
+            curve.append({"epoch": ep + 1, "loss": round(tot / n, 4),
+                          "facing": round(acc_, 4), "x_blocks": round(mx_, 3)})
+        print(line, flush=True)
 
     # ---- проверка ----
     model.eval()
@@ -274,6 +305,12 @@ def run(args):
     print(f"{'сторона света':22s} {acc * 100:8.0f}% {25:12d}%  "
           f"{'хорошо' if acc > 0.7 else 'слабо':>8s}")
     report["facing_acc"] = round(acc, 4)
+    if curve:
+        report["curve"] = curve
+        print("\nКРИВАЯ ОБУЧЕНИЯ (окупаются ли лишние эпохи)")
+        print(f"{'эпоха':>6s} {'потеря':>9s} {'сторона света':>15s} {'x, блоков':>11s}")
+        for c in curve:
+            print(f"{c['epoch']:6d} {c['loss']:9.4f} {c['facing'] * 100:14.0f}% {c['x_blocks']:11.2f}")
     print("=" * 66)
 
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
@@ -331,12 +368,16 @@ def main():
     ap.add_argument("--epochs", type=int, default=12)
     ap.add_argument("--batch", type=int, default=32)
     ap.add_argument("--lr", type=float, default=5e-4)
-    ap.add_argument("--width", type=int, default=426)
-    ap.add_argument("--height", type=int, default=240)
+    ap.add_argument("--width", type=int, default=640)
+    ap.add_argument("--height", type=int, default=360)
     ap.add_argument("--cores", type=int, default=5, help="лимит ядер CPU")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--mobs", action="store_true", help="добавить мобов в кадр")
     ap.add_argument("--out", default="vision.pt")
+    ap.add_argument("--test-samples", type=int, default=0,
+                    help="размер проверочной выборки (0 — одна шестая от обучающей)")
+    ap.add_argument("--eval-every", type=int, default=0,
+                    help="проверять на новых мирах каждые N эпох (0 — только в конце)")
     ap.add_argument("--ram-limit", type=int, default=1200,
                     help="сколько МБ ОЗУ можно занять кадрами")
     ap.add_argument("--quick", action="store_true", help="быстрая проверка на малой выборке")

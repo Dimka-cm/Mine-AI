@@ -169,3 +169,56 @@ def test_forward_shapes():
     reg, fac = net(torch.zeros(2, 3, 96, 128))
     assert reg.shape == (2, len(PV.TARGETS))
     assert fac.shape == (2, 4)
+
+
+# --- качество картинки ----------------------------------------------------
+def test_frame_quality_thresholds(env):
+    """
+    Приёмочные пороги кадра: детализация >= 7, цветов >= 53 000.
+
+    Детализация меряется средним градиентом яркости — той же мерой, что и
+    референсные изображения (их значения 4.68 / 11.26 / 7.88 она
+    воспроизводит с точностью до десятых).
+
+    Важно, КАК порог достигнут. Поднять цифру амплитудой шума легко:
+    разброс x2.6 даёт 16.35, но камень превращается в телевизионный снег.
+    Честный путь — мельче тексель (TEX=192): рисунок тот же, он просто не
+    растягивается по крупному блоку. Этот тест ловит падение качества,
+    но не мешает поднимать его по делу.
+    """
+    from PIL import Image
+
+    from brain.env.mc_env import WORLD_D, WORLD_W
+
+    # Меряем по многим ракурсам, а не по паре. Детализация сильно зависит
+    # от того, куда смотрит агент: упёрся носом в стену — 3.8 (там нечего
+    # детализировать, и это не дефект), видит поле с блоками — 14.9.
+    # Порог проверяем по среднему, иначе тест меряет удачу выбора ракурса.
+    rc = Raycaster(640, 360, fov=75.0, max_dist=12.0)
+    rng = np.random.default_rng(0)
+    dets, cols = [], []
+    for i in range(24):
+        if i % 8 == 0:
+            env.reset()
+        for _ in range(50):
+            x = int(rng.integers(1, WORLD_W - 1))
+            z = int(rng.integers(1, WORLD_D - 1))
+            if env.world[x, 2, z] == 0:
+                break
+        im = rc.render(env.world, x, 2, z, int(rng.integers(0, 4)), 0, [])
+        g = np.asarray(Image.fromarray(im).convert("L"), np.float32)
+        dets.append((np.abs(np.diff(g, axis=1)).mean()
+                     + np.abs(np.diff(g, axis=0)).mean()) / 2)
+        cols.append(len(np.unique(im.reshape(-1, 3), axis=0)))
+    assert np.mean(dets) >= 7.0, f"детализация {np.mean(dets):.2f} < 7"
+    assert np.mean(cols) >= 53_000, f"цветов {int(np.mean(cols))} < 53000"
+
+
+def test_texture_amplitude_not_inflated():
+    """
+    Зерно не должно быть пережато. Атлас — множители яркости; если разброс
+    уполз далеко за 0.70..1.30, значит кто-то поднимал детализацию шумом.
+    """
+    from brain.env.render import _ATLAS
+    assert _ATLAS.min() >= 0.60, f"слишком тёмное зерно: {_ATLAS.min():.2f}"
+    assert _ATLAS.max() <= 1.40, f"слишком яркое зерно: {_ATLAS.max():.2f}"

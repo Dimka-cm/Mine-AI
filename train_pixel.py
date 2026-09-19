@@ -52,8 +52,8 @@ def parse_args() -> argparse.Namespace:
                    help="вести по целям от простых к сложным")
     p.add_argument("--vision", default="vision.pt",
                    help="обученные глаза; пусто — начать со случайных")
-    p.add_argument("--width", type=int, default=426)
-    p.add_argument("--height", type=int, default=240)
+    p.add_argument("--width", type=int, default=640)
+    p.add_argument("--height", type=int, default=360)
     p.add_argument("--n-frames", type=int, default=4)
     p.add_argument("--batch", type=int, default=32)
     p.add_argument("--lr", type=float, default=1e-4)

@@ -17,19 +17,31 @@ on:
       samples:
         description: "Сколько кадров собрать"
         required: false
-        default: "4000"
+        default: "18000"
       epochs:
         description: "Сколько эпох учить"
         required: false
-        default: "20"
+        default: "25"
+      test_samples:
+        description: "Проверочная выборка (0 = 1/6 от обучающей)"
+        required: false
+        default: "1500"
+      cores:
+        description: "Ядер под обучение (у раннера их 4)"
+        required: false
+        default: "4"
+      eval_every:
+        description: "Проверять на новых мирах каждые N эпох"
+        required: false
+        default: "5"
       width:
         description: "Ширина кадра"
         required: false
-        default: "426"
+        default: "640"
       height:
         description: "Высота кадра"
         required: false
-        default: "240"
+        default: "360"
 
 jobs:
   train:
@@ -63,16 +75,20 @@ jobs:
           python -c "import torch; print('torch', torch.__version__)"
 
       - name: Обучить зрение
-        # Раннер даёт 2 ядра и ~16 ГБ ОЗУ, но кадры едят память:
-        # 426x240x3 = 307 КБ на кадр. Лимит держим осознанно.
+        # Раннер даёт 4 ядра и ~16 ГБ ОЗУ. Резервировать ядро "пользователю"
+        # здесь незачем — за машиной никто не сидит, берём все 4.
+        # Кадр 640x360x3 = 691 КБ. 18000+1500 кадров = 13.5 ГБ, плюс torch
+        # и батч — итого ~15.1 ГБ из 15.5 выделенных.
         run: |
           python pretrain_vision.py \
             --samples ${{ inputs.samples }} \
             --epochs ${{ inputs.epochs }} \
             --width ${{ inputs.width }} \
             --height ${{ inputs.height }} \
-            --cores 2 \
-            --ram-limit 6000 \
+            --cores ${{ inputs.cores }} \
+            --test-samples ${{ inputs.test_samples }} \
+            --eval-every ${{ inputs.eval_every }} \
+            --ram-limit 15500 \
             --out vision.pt 2>&1 | tee train.log
 
       - name: Собрать отчёт в сводку
@@ -84,6 +100,11 @@ jobs:
             echo ""
             echo '```'
             sed -n '/ЧТО АГЕНТ НАУЧИЛСЯ ВИДЕТЬ/,/^===/p' train.log || tail -30 train.log
+            echo '```'
+            echo ""
+            echo "### Кривая обучения"
+            echo '```'
+            sed -n '/КРИВАЯ ОБУЧЕНИЯ/,$p' train.log | head -20
             echo '```'
           } >> $GITHUB_STEP_SUMMARY
 

@@ -30,8 +30,8 @@ from .spaces import DENSE_DIM, GRID_SIZE, N_ACTIONS, N_ITEMS
 @dataclass
 class PixelConfig:
     """Настройки пиксельной модели."""
-    width: int = 426
-    height: int = 240
+    width: int = 640
+    height: int = 360
     n_frames: int = 4          # сколько кадров видит одновременно
     item_emb: int = 24
     cnn_out: int = 512
