@@ -1,0 +1,6 @@
+{"episode": 2, "goal": "oak_log", "reward": -1.575, "eps": 0.9993, "steps": 40}
+{"episode": 4, "goal": "oak_log", "reward": -0.55, "eps": 0.9985, "steps": 80}
+{"episode": 6, "goal": "oak_log", "reward": -0.145, "eps": 0.9977, "steps": 120}
+{"episode": 2, "goal": "oak_log", "reward": -1.575, "eps": 0.9993, "steps": 40}
+{"episode": 4, "goal": "oak_log", "reward": -0.55, "eps": 0.9985, "steps": 80}
+{"episode": 6, "goal": "oak_log", "reward": -0.145, "eps": 0.9977, "steps": 120}

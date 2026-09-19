@@ -38,6 +38,11 @@ jobs:
       - name: Тесты
         run: python -m pytest tests/ -q
 
+      - name: Проверить, что пиксельный цикл запускается
+        # Быстрый прогон на маленьком кадре: ловит поломку связки
+        # среда -> буфер -> модель раньше, чем она съест часы обучения.
+        run: python train_pixel.py --smoke --cores 2 --vision ""
+
       - name: Проверить синтаксис JS-моста
         run: node --check bot/bridge.js
 
