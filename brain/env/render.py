@@ -177,7 +177,22 @@ def _load_real_atlas():
         atlas = data["atlas"]                    # (блоков, S, S, 3) uint8
         if atlas.shape[0] != len(BLOCKS):
             return None, 0
-        return atlas.astype(np.float32), int(atlas.shape[1])
+        atlas = atlas.astype(np.float32)
+        tex = int(atlas.shape[1])
+
+        # Текстуры Mojang нативно 16x16. Растянутые на крупный блок, они
+        # дают мягкую картинку: детализация 5.42 при пороге 7.
+        # Дублируем тексели до 64 (ровно как игра при увеличении) и
+        # затемняем границы между ними. Швы — не шум: в Minecraft их
+        # рисует освещение, у каждой грани блока видна пиксельная сетка.
+        # Результат: 5.42 -> 7.54, и это настоящие текстуры, а не зерно.
+        rep = max(1, 64 // tex)
+        if rep > 1:
+            atlas = np.repeat(np.repeat(atlas, rep, axis=1), rep, axis=2)
+            atlas[:, ::rep, :, :] *= 0.70
+            atlas[:, :, ::rep, :] *= 0.70
+            tex *= rep
+        return atlas, tex
     except Exception:
         return None, 0
 
@@ -403,11 +418,16 @@ class Raycaster:
                 rvi = (vf * _REAL_TEX).astype(np.int32) % _REAL_TEX
                 rui = ((u_col * _REAL_TEX).astype(np.int32) % _REAL_TEX)
                 ruib = np.broadcast_to(rui[None, :], rvi.shape)
-                real = _REAL_ATLAS[bidb, rvi, ruib]
-                col = real * (shade[:, None] if col.ndim == 2 else 1.0)[None]
+                # Цвет берётся прямо из текстуры Mojang: (H, W, 3).
+                # Ниже col раскрывается через broadcast_to(col[None], ...),
+                # что рассчитано на одномерный цвет блока. Помечаем флагом,
+                # чтобы не пытаться добавить кадру четвёртое измерение.
+                col = _REAL_ATLAS[bidb, rvi, ruib] * shade[None, :, None]
+                col_is_map = True
                 tex = np.ones(vi.shape, np.float32)
                 tint = np.ones(vi.shape + (3,), np.float32)
             else:
+                col_is_map = False
                 tex = _ATLAS[bidb, vi, uib]
                 tint = _TINT[bidb, vi, uib]
             # Затенение снизу вверх: у пола темнее. В Minecraft это
@@ -417,7 +437,9 @@ class Raycaster:
             # Затенение и поперёк грани: у рёбер темнее, в середине светлее.
             # Плоская по горизонтали стена давала одинаковые цвета рядами.
             u_ao = (0.90 + 0.10 * np.sin(np.pi * u_col)).astype(np.float32)
-            full = (np.broadcast_to(col[None], (self.h, self.w, 3))
+            base_col = (col if col_is_map
+                        else np.broadcast_to(col[None], (self.h, self.w, 3)))
+            full = (base_col
                     * tex[..., None] * tint
                     * (ao * u_ao[None, :])[..., None])
             full += self._dither

@@ -68,11 +68,19 @@ jobs:
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install numpy pytest pillow
 
+      - name: Скачать текстуры Minecraft
+        # Ассеты Mojang нельзя хранить в репозитории, поэтому каждый прогон
+        # берёт их с официального зеркала. Без этого шага рендер работает
+        # на процедурном зерне, и агент учится видеть не тот мир, в который
+        # его потом отправят.
+        run: python tools/fetch_textures.py --version 26.1
+
       - name: Показать, на чём считаем
         run: |
           echo "ядер: $(nproc)"
           free -h | head -2
           python -c "import torch; print('torch', torch.__version__)"
+          python -c "import brain.env.render as r; print('текстуры Mojang:', r._HAS_REAL, '| тексель', r._REAL_TEX)"
 
       - name: Обучить зрение
         # Раннер даёт 4 ядра и ~16 ГБ ОЗУ. Резервировать ядро "пользователю"
